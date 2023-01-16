@@ -7,5 +7,5 @@ test('has title', async ({ page }) => {
 
 test('renders correctly', async ({ page }) => {
   await page.goto('/');
-  await expect(page).toHaveScreenshot('desktop/landing-page.png');
+  await expect(page).toHaveScreenshot('landing-page.png');
 });

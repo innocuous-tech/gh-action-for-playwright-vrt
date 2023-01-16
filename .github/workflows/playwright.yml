@@ -1,11 +1,17 @@
-name: Playwright Tests
+name: Playwright
+
 on:
   push:
     branches: [main, master]
+    paths-ignore:
+      - '**/*.md'
   pull_request:
     branches: [main, master]
+    paths-ignore:
+      - '**/*.md'
 jobs:
-  test:
+  e2e:
+    name: E2E Tests
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
@@ -13,15 +19,44 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
+      - uses: pnpm/action-setup@v2.2.4
+        with:
+          version: ^7.x.x
+
       - name: Install dependencies
         run: pnpm i
+
       - name: Install Playwright Browsers
-        run: pnpm playwright install --with-deps
+        run: pnpm playwright install --with-deps chromium
+
       - name: Run Playwright tests
         run: pnpm playwright test
+
       - uses: actions/upload-artifact@v3
-        if: always()
+        if: failure()
         with:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
+
+  # TODO: If we want better test output
+  # publish_artifacts:
+  #   name: 'Publish visual regression test failure diffs to to testresults.marcusfelling.com'
+  #   runs-on: ubuntu-latest
+  #   needs: [test]
+  #   if: ${{ always() && contains(needs.*.result, 'failure') }}
+  #   steps:
+  #     - name: Download artifacts
+  #       uses: actions/download-artifact@v2
+  #       id: download
+
+  #     - name: Publish to GitHub Pages
+  #       uses: peaceiris/actions-gh-pages@v3.7.3
+  #       with:
+  #         external_repository: innocuous-tech/gh-action-for-playwright-vrt
+  #         publish_branch: main
+  #         personal_token: ${{ secrets.GITHUB_TOKEN }}
+  #         publish_dir: ${{steps.download.outputs.download-path}}
+  #         keep_files: true
+  #         user_name: 'github-actions[bot]'
+  #         user_email: 'github-actions[bot]@users.noreply.github.com'
