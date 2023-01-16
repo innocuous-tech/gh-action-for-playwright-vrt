@@ -66,8 +66,8 @@ const config: PlaywrightTestConfig = {
     },
   ],
 
-  /* Folder for test artifacts such as screenshots, videos, traces, etc. */
-  outputDir: 'e2e-artifacts/',
+  /* Ignore snapshots locally. We want the source of truth to ONLY come from CI. */
+  ignoreSnapshots: !process.env.CI,
 
   /* Run your local dev server before starting the tests */
   webServer: {
